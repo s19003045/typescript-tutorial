@@ -119,3 +119,149 @@ let response2 = answer2
  * answer 若為 null 型別，後續就會有問題
  *
  */
+
+
+// ===================day 3==============================
+let info = {
+  name: 'Maxwell',
+  age: 20,
+  hasPet: false,
+};
+
+let someone = {
+  knows: undefined,
+  identity: null
+};
+
+/**
+ * 物件的屬性若直接代入 Nullable Type，則不會被視為 any 型別，
+ * 而是等同於該 Nullable Type 本身的值
+ * （undefined 型別的值就是 undefined；null 型別的值就是 null）
+ */
+
+
+// TS 正確地推論型別，若不正確地賦值則警示
+info.name = null
+info.age = 'john'
+info.hasPet = 13
+
+someone.knows = null
+someone.identity = 13
+
+
+// 少了一個 key
+info = {
+  name: 'Maxwell',
+  // age: 20,
+  hasPet: false,
+};
+
+// 多了一個 key
+someone = {
+  knows: undefined,
+  identity: null,
+  age: 18
+};
+
+// 新增 key ，不行
+info.school = 'jsckd'
+
+/**
+ * 因為當初未定 school 這個 key
+ */
+
+
+// 刪除物件的屬性後，竟然沒有警示！
+delete info.hasPet;
+console.log(info);
+
+info.hasPet = true
+/**
+ * 這個 issue 尚未被解決
+ */
+
+
+let box2 = {
+  size: 60,
+  name: 'largeBox'
+  smallBox: {
+    money: 70,
+    size: 30,
+    name: 'smp'
+  }
+}
+box2.size = 'john'
+box2.size = 80
+box2.name = 'abcde'
+
+
+let box3 = {
+  ...box2,
+  mediumBox: {
+    money: '$70',
+    size: 40,
+    name: 'mmp'
+  }
+}
+console.log(box3)
+
+typeof box3
+console.log(typeof box3)
+
+
+// 宣告為 object
+let box5: object = {
+  name: '5box',
+  size: 150
+}
+
+// 不能這樣寫
+box5.name = 'goodness'
+box5.size = 200
+
+// 可以覆寫
+box5 = {
+  name: '6box'
+}
+
+// 可以變更 key 的 value 為其他型別
+box5 = {
+  size: null
+}
+// 可以變更 key 的 value 為其他型別
+box5 = {
+  name: 15,
+  size: undefined
+}
+
+
+
+// object type
+let something: object = {
+  time: '2020',
+  mans: 2000
+}
+
+// 不可以賦值基本型別
+something = 2000
+something = null
+something = undefined
+
+// 可以賦值任何 object
+something = {
+  size: 50,
+  name: 'JOhn'
+}
+
+// 可以賦值任何 Array
+// array 在 TS 中，被認定為 object
+something = [1, 2, 3]
+something = new Array()
+
+// 這樣變更 value ，不允許
+something[0] = 3
+
+// 這樣也可以
+something = new Number()
+something = new Date()
+
