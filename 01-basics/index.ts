@@ -183,7 +183,7 @@ info.hasPet = true
 
 let box2 = {
   size: 60,
-  name: 'largeBox'
+  name: 'largeBox',
   smallBox: {
     money: 70,
     size: 30,
@@ -264,4 +264,160 @@ something[0] = 3
 // 這樣也可以
 something = new Number()
 something = new Date()
+
+
+
+// =================== day 4 ：TS 如何推論函式物件的型別 ==============================
+
+// without parameter, no return
+let aSimpleFunction = function () { console.log('Hi!', hello); };
+
+// arrow function, no return
+let arrowFunction = () => { console.log('good news') }
+
+// with parameter
+let putSomething = function (msg: string) {
+  return msg
+}
+
+// with two parameter, and return something
+const addition = function (num1, num2) {
+  return num1 + num2;
+};
+/**
+ * TS 建議參數要指定 type
+ * 
+ * TS 推論：
+ * 參數 'num1' 隱含了 'any' 類型
+ * 參數 'num2' 隱含了 'any' 類型
+ * const addition: (num1: any, num2: any) => any
+ */
+
+
+// with two parameter, and return something
+const plus = function (num1: string, num2: number) {
+  return num1 + num2;
+};
+
+let plusResult0 = plus("abc", 2)
+/**
+ * TS 會推論出 plusResult0 為 string
+ * 
+ * TS 推論說明：
+ * let plusResult0: string
+ *
+ */
+
+let plusResult1: number = plus(1, 2)
+/**
+ * plus function's return type must be string, not number
+ * argument 1 :type error
+ * 
+ * TS 推論說明：
+ * 類型 '1' 的引數不可指派給類型 'string' 的參數。
+ */
+
+
+let plusResult2: void = plus('john', 2)
+/**
+ * plus function's return type must be string, not void
+ * 
+ * TS 推論說明：
+ * 類型 'string' 不可指派給類型 'void'。
+ */
+
+let plusResult3: string = plus("1", 2)
+/**
+ * plus function's return type must be string, not number
+ * argument 1 :type error
+ *
+ */
+
+// TS 建議參數要指定型別，例外狀況：
+const aJSONString = '{"name":"John","age":18}'
+
+// 不建議這樣寫
+let parseJSON = JSON.parse(aJSONString)
+/**
+ *
+ * (method) JSON.parse(
+ * text: string,
+ * reviver?: ((this: any, key: string, value: any) => any) | undefined
+ * ): any
+ *
+ * TS 識別 JSON.parse 輸出為 any
+ * let parseJSON: any
+ */
+
+
+// 建議這樣寫：清楚註記要轉換出來的物件中之屬性型別
+let parseJSON1 = JSON.parse(aJSONString) as { name: string, age: number }
+/**
+ * TS 推論：
+ * let parseJSON1: {
+    name: string;
+    age: number;
+}
+ */
+
+
+let minus = function (para1: number, para2: number) {
+  return para1 + para2
+}
+
+// 可以這樣履寫：變換位置
+minus = function (para1: number, para2: number) {
+  return para2 + para1
+}
+
+// 錯誤覆寫
+minus = function (para1: string, para2: number) {
+  return para1 + para2
+}
+
+// 錯誤覆寫
+minus = function (para1: number, para2: number) {
+  para1 + para2
+}
+/**
+ * TS 推論如下：
+ * 類型 '(para1: number, para2: number) => void' 不可指派給類型 '(para1: number, para2: number) => number'。
+ */
+
+
+
+// 測試
+let doesItWork1 = function doesItWork1() {
+  return undefined
+}
+
+let doesItWork2 = function doesItWork2() {
+  return null
+}
+
+let doesItWork3 = function doesItWork3() {
+  void (8)
+}
+
+let doesItWork4 = function doesItWork4(): undefined {
+  return null
+}
+
+let doesItWork5 = function doesItWork5(): undefined {
+
+}
+
+let doesItWork6 = function doesItWork6(): void {
+  return undefined
+}
+
+
+
+
+
+
+
+
+
+
 
