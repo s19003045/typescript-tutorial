@@ -412,12 +412,240 @@ let doesItWork6 = function doesItWork6(): void {
 }
 
 
+// ==============day 4==================
+
+let numbers = [1, 2, 3, 4, 5]
+/**
+ * TS 判定為 number 陣列
+ * 
+ * 也可以如下表示：
+ * let numbers: number[] = [1, 2, 3, 4, 5]
+ */
+let numbers100: number[] = [1, 2, 3, 4, 5]
+
+numbers[1] = 'john'
+numbers[1] = 11
+numbers = ['apple', 'banana', 'orange']
+numbers.push('hello')
+numbers.push(6)
+numbers.push(null)
+numbers.push(undefined)
+/**
+ * 不合當初定義的，會跳警示
+ */
 
 
+let fruits = ['apple', 'banana', 'orange']
+/**
+ * TS 判定為 string 陣列
+ */
+fruits.push(11)
+fruits.push('pair')
+fruits[11] = 100
+fruits[10] = 'pineapple'
+numbers.push(null)
+numbers.push(undefined)
+numbers.concat([11, 22, 33])
+numbers.concat(['11', '22', 33])
+
+numbers = [77, 88, 99]
+numbers = ['77', '88', '99']
+/**
+ * 不合當初定義的，會跳警示
+ */
 
 
+let mix = ['chair', 1, 2, 3, 'table']
+/**
+ * TS 判定為 number | string 陣列
+ */
+mix.push(15)
+mix.push('tree')
+mix[4] = 16
+mix[5] = 'soil'
+numbers.push(null)
+numbers.push(undefined)
+/**
+ * 不合當初定義的，會跳警示
+ */
+
+let mix2: (number | string)[] = [1, '2', 3, '4']
+mix2.push(1)
+mix2.push('hello')
+mix[2] = 'good'
+mix2 = [1, '2', 3, '4']
+/**
+ * 宣告陣列時定義陣列元素型別外，並且賦值
+ * 則後續操作，TS 不會跳警示
+ * 
+ */
+
+let mix3: (number | string)[]
+
+mix3.push(1)
+mix3.push('hello')
+mix3[2] = 'good'
+mix3.concat([1, '2'])
+mix3 = [1, '2', 3, '4']
+/**
+ * 宣告陣列時定義陣列元素型別外，沒有賦值
+ * 則後續操作，TS 會跳警示
+ * 若在指派(賦值)前操作該變數，則會跳警示
+ *
+ */
+
+let mix4: (number | string)[]
+mix4 = [1, '2', 3, '4']
+
+mix4.push(1)
+mix4.push('hello')
+mix4[2] = 'good'
+mix4.concat([1, '2'])
+/**
+ * 宣告陣列時定義陣列元素型別外，沒有賦值
+ * 則後續操作，TS 會跳警示
+ * 若在指派(賦值)後操作該變數，則不會跳警示
+ *
+ */
 
 
+let arrayOfHash1 = [
+  { message: 'john' },
+  { message: 'Mary' },
+  { message: 'Peter' }
+]
+arrayOfHash1 = [
+  { message: 'john' },
+  { message: 'Mary', boy: false },
+  { message: 'Peter' }
+]
+arrayOfHash1 = [
+  { message: 'john' },
+  { message: 'Mary', city: 'taiwan' },
+  { message: 'Peter' }
+]
+arrayOfHash1 = [
+  { message: 'john' },
+  { message: 'Mary' },
+]
+arrayOfHash1 = [
+  { message: 'john', age: 18 },
+  { message: 'Mary' },
+]
+/**
+ * 陣列中的 object 之值只接受 string
+ */
 
+let arrayOfHash2 = [
+  { message: 'john' },
+  { age: 18 },
+  { message: 'Peter' }
+]
+/**
+ * TS 識別如下：
+ * array 中之 object 的 key 可能有 message 而無 age，
+ * 或無 message 而有 age，而有 message 之value型別為 string，
+ * 而 age 之 value型別為 number
+ * 
+ * let arrayOfHash2: ({
+    message: string;
+    age?: undefined;
+} | {
+    age: number;
+    message?: undefined;
+})[]
+ */
+arrayOfHash2.push({ message: 'Mary' })
+arrayOfHash2.push({ age: 'good' })
+arrayOfHash2.push({ message: 'john', age: 18 })
+/**
+ * 不接受的型別，TS 則會警示
+ */
+
+let arrayOfHash3 = [
+  { message: 'john', age: 20, boy: true },
+  { message: 'john', age: 20 },
+  { message: 'Peter', age: 18 }
+]
+/**
+ * TS 識別如下：
+ * let arrayOfHash3: ({
+    message: string;
+    age: number;
+    boy: boolean;
+} | {
+    message: string;
+    age: number;
+    boy?: undefined;
+})[]
+ */
+arrayOfHash3[1].boy = false
+arrayOfHash3[1].boy = undefined
+arrayOfHash3[1].boy = 22
+arrayOfHash3[1].boy = '22'
+/**
+ * 上面只接受 undefined , boolean 的型別，
+ * 不接受其他型別
+ */
+
+
+// 陣列中放入 function 
+let functionsArray = [
+  function addition(num1: number, num2: number) { return num1 + num2 },
+  function subtraction(num1: number, num2: number) { return num1 - num2 }
+]
+/**
+ * TS 型別推論：
+ * let functionsArray: ((num1: number, num2: number) => number)[]
+ */
+
+
+// 陣列中放入不同型別的陣列
+let mixArray = [
+  [1, 2, 3],
+  ['john', 'mary'],
+  [true, false, true]
+]
+/**
+ * TS 型別推論如下：
+ * let mixArray: (number[] | string[] | boolean[])[]
+ */
+
+// 混合更多型別陣列，放進陣列中
+let mixArray1 = [
+  [1, 2, 3],
+  ['john', 'mary'],
+  [true, false, true],
+  [1, 'john', true, null],
+  [undefined, 100]
+]
+/**
+ * TS 型別推論如下：
+ * let mixArray1: ((string | number | boolean | null)[] | (number | undefined)[])[]
+ *
+ * 陣列中的元素接受混合型別的陣列，沒有單一型別的陣列！！
+ */
+
+
+// 空陣列
+let blankArray = []
+/**
+ * TS推論：
+ * let blankArray: any[]
+ */
+
+/**
+ * 單元重點整理：
+ *
+ * 重點 1. 陣列的型別推論
+若集合 S 為陣列裡所有元素各種型別的集合，大部分的情形下，該陣列被 TypeScript 型別推論的結果是：
+ *
+ * 重點 2. 陣列的型別推論與註記時機
+大部分的狀態下，陣列型別的推論是符合開發者期待的
+除非遇到以下狀況，才需要對儲存陣列型別的變數積極地作型別註記：
+空陣列值必須積極註記，這是會了要革除 any 可能帶來的禍害
+陣列裡的元素沒有你要求的型別，可以用 union 技巧作積極的型別註記
+為了程式碼的可讀性，通常一個陣列擁有多個型別的話（也就是 Heterogenous Type Array），建議還是用 union 註記一下，不然要在陣列裡面用人眼遍歷過陣列的每一個值對應的每個型別 —— 跟直接註記比起來：型別註記是比較恰當的選擇喔
+ */
 
 
