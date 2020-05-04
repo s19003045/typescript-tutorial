@@ -649,3 +649,105 @@ let blankArray = []
  */
 
 
+
+//=================day 6 陣列與函式 X 陣列與元組 - Array & Functions & Tuples ========
+
+let mixFunc = [
+  function hello(msg: string) { console.log(msg) },
+  [1, 2, 3],
+  [1, '2', 3],
+  ['good', function (num: number) { return num }]
+]
+
+// 大部分情況，callback function 之參數不需要特別註記型別，例如：
+let numberMix = [1, 2, 3, 4, 5]
+let doubleNumbers = numberMix.map(function (val, index) { return val * 2 })
+/**
+ * TS 可以推論 callback function 之參數型別：
+ * let doubleNumbers: number[]
+ *
+ */
+
+/**聽不懂 「泛型」、型別化名（Type Alias），沒關係，之後會講到。
+ *
+ * 重點 1. 函式的參數不需被註記的情況
+回呼函數在某些情況下不需對輸入參數部分進行註記，原因是藉由泛用型別 Generics 的機制，我們可以設計出讓 TypeScript 能夠藉由泛用型別參數所獲取的外部型別資訊，提前預知到未來的程式碼執行的狀況下，對於各種變數、函式的輸入輸出、類別屬性與方法的型別等等 ... 的型別推論。
+型別化名（Type Alias）的運用在大部分的狀況下也可以取代積極註記的必要性。
+ */
+
+// ====== TS 的 Tuple  型別，javascript 中沒有此型別 =====
+let BMWDetail = ['MBW', 'AX-305', new Date()]
+/**
+ * TS 判斷型別：
+ * let BMWdetail: (string | Date)[]
+ */
+BMWDetail[0] = new Date()
+
+
+// Tuple，宣告時即定義每個元素的型別
+let BMWModal: [string, string, Date] = ['BMW', 'car', new Date(2020, 1, 1)]
+let TOYOTAModal: [string, string, Date] = ['TOYOTA', 'car', new Date(2020, 1, 1)]
+let BenzModal: [string, string, Date] = ['Benz', 'car', new Date(2020, 1, 1)]
+let SuzukiModal: [string, string, Date] = ['Suzuki', 'car', new Date(2020, 1, 1)]
+BMWModal[0] = 'Benz'
+BMWModal[0] = 1234 // 指派值的型別錯誤
+BMWModal[3] = new Date() // 超出當初定義的長度
+
+
+/**
+ * TS 判斷型別：
+ * let BMWModal: [string, string, Date]
+ */
+
+/**
+ * 重點 2. 元組值指派行為
+當元組值被直接指派到變數時，必進行積極型別註記。
+
+而被指派元組型別的變數也必需進行積極註記。
+
+綜合以上觀點，只要遇到元組必須要進行註記行為。
+ */
+
+
+/**
+ * 陣列型別與 Tuple 型別是不一樣的註記方式
+ * 陣列型別註記： (string | number | Date)[]
+ * => 陣列中的每個元素可以是 string, number, Date 這三種之一種
+ *
+ * Tuple 型別註記：[string, string, Date]
+ * => 陣列中的每個元素已清楚定義型別不能混肴
+ */
+
+
+/**
+ * 重點 3. 陣列與元組的差異
+型別陣列裡，只要裡面的元素之型別為此陣列規定的範疇內（比如說 (number | string)[] 只能存取數字跟字串），除了沒有限定元素的數量外，順序也不限定；元組型別則是除了元素的個數必須固定外，格式必須完全吻合，因此裡面元素型別的順序也是固定。
+ * 
+ * 
+ */
+
+
+/**
+ * 如上，若要一次宣告多個 Tuple ，而且型別是一樣的，能不能共用型別註記？
+ * 可以的！如下：
+ */
+//型別化名（Type Alias）
+type Vehicle = [string, string, Date]
+
+// 引用型別化名，以註記型別
+let MitsubishiModal: Vehicle = ['BMW', 'car', new Date(2020, 1, 1)]
+let RocheModal: Vehicle = ['TOYOTA', 'car', new Date(2020, 1, 1)]
+let GogoModal: Vehicle = ['Benz', 'car', new Date(2020, 1, 1)]
+let CocoModal: Vehicle = ['Suzuki', 'car', new Date(2020, 1, 1)]
+
+CocoModal = ['Suzuki', 'car'] // 不能少一個元素
+CocoModal = ['Suzuki', 'car', new Date(2020, 1, 1), 'john']  // 不能多一個元素
+CocoModal = ['Suzuki', 123, new Date(2020, 1, 1)]  // 型別錯誤
+
+
+// 如果 tuple 的每個元素都有特定意義，用類似 JSON 的格式表達反而更好
+let HyndaiModal = {
+  brand: 'BMW',
+  transportation: 'car',
+  releasedDate: new Date(2020, 1, 1)
+}
