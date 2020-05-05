@@ -832,3 +832,160 @@ enum E { V1, V2, V3, ..., Vn }
 列舉裡的元素可以自訂對應的字串，但是必須接續訂立對應的字串值下去，或者是再返回定義對應值為數字型別
 可以使用列舉裡定義過後的值進行後續自訂對應值的運算
  */
+
+
+
+//================= day 7 明文型別==============
+/**
+ * 在之前的學習中，都可以看到明文型別的出現
+ * 
+ * 型別化名(Type Alias) 則是用來把明文型別"抽象化"的方式
+ */
+
+// 參數一定要標註型別，回傳值不一定，TS 會推論回傳值的型別
+let addFunc = (num1: number, num2: number) => { return num1 + num2 }
+let subtractFunc = (num1: number, num2: number) => { return num1 + num2 }
+
+// 可以把上述相同的"明文型別"抽象化，等號右邊即是"明文型別"
+type MetaOperator = (num1: number, num2: number) => number
+
+// 引用型別化名：引用型別化名後，函式的參數則不用標註型別，回傳值也不用標註型別
+let powerFunc: MetaOperator = (num1, num2) => { return num1 * num2 }
+let quickFunc: MetaOperator = (num1, num2) => { return num1 * (num1 + num2) * num2 }
+
+// 當然也可以在函式參數標註型別，TS 會檢查是否符合型別化名
+let powerFunc1: MetaOperator = (num1: string, num2: string) => { return num1 * num2 }
+let powerFunc2: MetaOperator = (num1: number, num2: number) => { return (num1 * num2).toString() }
+
+// 引用函式時，參數型別正確
+powerFunc(1, 2)
+
+// 引用函式時，參數型別錯誤
+powerFunc('1', '2')
+
+
+// 試著利用型別化名在其他明文型別中
+// 將 JSON object 型別抽像化
+
+type mixTuple = {
+  name: string,
+  age: number
+}
+
+// 引用型別化名，TS 會根據型別化名來檢查 JSON 裡的東西
+// TS 檢查是確
+let wendy: mixTuple = {
+  name: 'Wendy',
+  age: 19
+}
+
+// 引用型別化名，TS 會根據型別化名來檢查 JSON 裡的東西
+// TS 檢查到錯誤
+let john: mixTuple = {
+  name: 'John',
+  age: '20' //型別錯誤
+}
+
+john.name = 500  // 型別錯誤
+
+john = {
+  name: 'John',
+  //age: 20  // 不可減少當初定義的屬性
+}
+
+// 完全覆寫，通過 TS 檢測
+john = {
+  name: 'John',
+  age: 20
+}
+
+let Peter: mixTuple = {
+  fistname: 'Peter',
+  age: 22
+}
+
+let Johnny: mixTuple = {
+  name: 'Johnny Wu',
+  fistname: 'Johnny',
+  age: 22
+}
+
+
+// ==== 特別注意，參數如何代入
+// 先宣告一個型別化名
+type personInfo = {
+  name: string,
+  age: number,
+  hasPet: boolean
+}
+// 針對函式的參數，以事先定義好的型別化名來檢查
+let printInfo = function (info: personInfo) {
+  console.log(`${info.name} is ${info.age}, and he\/she has Pet? $${info.hasPet}`)
+}
+// 參數正確
+printInfo({
+  name: 'John',
+  age: 20,
+  hasPet: true
+})
+
+// 直接在參數中多了一個屬性，TS 不允許
+printInfo({
+  name: 'May',
+  age: 20,
+  hasPet: true,
+  hasCar: false
+})
+
+// 先宣告變數存放預定要放進函式的參數，多了一個屬性 hasCar
+let PeterInfo = {
+  name: 'Peter',
+  age: 20,
+  hasPet: true,
+  hasCar: false
+}
+
+// TS 允許這個狀況
+printInfo(PeterInfo)
+
+/**
+ * 小結論：
+若某變數 A 儲存某物件值，其中 A 沒有被積極註記（因此 TypeScript 會對 A 作型別推論，推論出 A 的明文型別格式）。
+另外，若變數 A 作為某函式（或方法）的參數，其中該參數有型別 T，則 TypeScript 只會針對 A 的格式至少符合型別 T（屬性型別對應正確、少一鍵不行但多一鍵以上都可以），則變數 A 通過該型別 T 的檢測。
+ */
+
+/**
+ *
+此單位重點整理：
+重點 1. 明文型別 Literal Types
+只要是表達廣義物件的格式或者是任意型別（包含原始型別的）複合組合（union 與 intersection 也算在內）-- 就隸屬於明文型別的範疇。
+
+也可推得，通常 TypeScript 會將任何廣義物件的型別推論為明文型別的格式。
+
+重點 2. 型別化名 Type Alias
+若我們有一個型別 T，T 可為任何的型別（包含原始型別、物件型別、TypeScript 內建型別、明文型別、複合型別、Generics 通用型別等）。其中我們想要讓該型別 T 等效於別名 A，則可以使用 TypeScript 的 type 關鍵字進行化名宣告：
+
+type A = T;
+型別化名的主要目的為簡化程式碼以及進行型別的抽象化（Type Abstraction）
+
+重點 3. 函式型別的化名
+若我們對型別 T 進行型別化名 U，其中 T 為函式型別，亦即：
+
+https://ithelp.ithome.com.tw/upload/images/20190917/20120614B2ERkOk0tu.png
+
+其中，任何變數 A 被型別化名 U 註記，則該變數被指派到的函式值，不需要積極註記，因為早在定義化名的時候，這個步驟就被做掉了。
+
+重點 4. 廣義物件型別的化名
+符合廣義物件完整性定律（參照 Day 03.）並且結合化名帶給開發者的功用，即是整理程式碼並且進行抽象化的動作。
+
+重點 5. 廣義物件的註記
+由於我們可以藉由存取廣義物件的表現形式在某變數裡，其中該變數沒有被積極註記，儘管該物件的值不完全符合函式（或方法）的參數所註記之型別，但只要該變數至少有符合型別的格式，依然可以通過函式（或方法）參數對於變數的值的驗證。若想避免此狀況發生，任何變數需要存取廣義物件時，必須進行積極註記型別的動作。
+
+其中，至少有符合參數型別的條件有三，假設沒有被註記的變數為 A，而將其代入某函式（或方法）作為參數，其參數型別為 T：
+
+A 必須與 T 規定的必填屬性與型別對應完全正確
+可以忽略 A 對 T 差集出來的屬性（相對 T 多出來的屬性）
+A 不能缺少任一個 T 所規定的屬性
+
+ */
+
