@@ -751,3 +751,84 @@ let HyndaiModal = {
   transportation: 'car',
   releasedDate: new Date(2020, 1, 1)
 }
+
+
+// =================DAY 6 ENUM===============
+enum WeekDay {
+  Sunday,
+  Monday,
+  Tuesday,
+  Wednesday,
+  Thursday,
+  Friday,
+  Saturday
+}
+/**
+ * 錯誤寫法：(不可使用 = )
+ * enum WeekDay = {  Sunday, Monday, Tuesday,...}
+ * 
+ */
+
+// 使用已建立的 enum
+let goChurchDay = WeekDay.Sunday
+console.log('goChurchDay:', goChurchDay)
+console.log(WeekDay)
+/**
+ * TS 型別推論：
+ * let goChurchDay: WeekDay
+ * 1.順相取值的結果為 enum 型別
+
+ * 2.既然 TS 會推論，所以可以選擇不標註型別
+ * 可以這樣寫：
+ * let goChurchDay: WeekDay = WeekDay.Monday
+ */
+
+// 印出 enum 物件
+console.log(WeekDay)
+/**
+ *
+{
+  '0': 'Sunday',
+  '1': 'Monday',
+  '2': 'Tuesday',
+  '3': 'Wednesday',
+  '4': 'Thursday',
+  '5': 'Friday',
+  '6': 'Saturday',
+  Sunday: 0,
+  Monday: 1,
+  Tuesday: 2,
+  Wednesday: 3,
+  Thursday: 4,
+  Friday: 5,
+  Saturday: 6
+}
+ */
+
+//印出的方式
+console.log(WeekDay[5])
+console.log(WeekDay.Monday)
+
+
+let goChurchDayValue = WeekDay[goChurchDay]
+/**
+ * 反相取值的結果為 string
+ * TS 推論：
+ * let goChurchDayValue: string
+ */
+console.log('goChurchDayValue:', goChurchDayValue)
+
+/**
+ * 重點 3. TypeScript 列舉
+1.列舉可以藉由 TypeScript 的 enum 關鍵字進行定義。若我們想定義列舉型別 E，其內含的元素為 V1, V2 ... Vn，則：
+enum E { V1, V2, V3, ..., Vn }
+2.定義列舉型別後，使用該列舉的值並代入到變數時，TypeScript 對於該變數的型別推論是 enum 型別
+3.定義列舉型別後，可直接使用列舉的名稱作為型別註記
+4.列舉具有反射性，所以可以藉由列舉呼叫元素出來的結果反查該元素本身的名稱
+5.列舉的潛規則：
+列舉可以被當成 JSON 物件看待（比如說也可以用 for...in... 迴圈迭代列舉的元素）；但與 JSON 物件的差別在於，使用列舉會獨立為 enum 型別，而 JSON 物件本身就是一種物件型別
+列舉裡的元素，每一個對應值是從數字 0 開始，每列一個元素會遞增上去
+列舉裡的元素可以自訂對應的數字，後續會一直不停地遞增上去
+列舉裡的元素可以自訂對應的字串，但是必須接續訂立對應的字串值下去，或者是再返回定義對應值為數字型別
+可以使用列舉裡定義過後的值進行後續自訂對應值的運算
+ */
