@@ -753,7 +753,7 @@ let HyndaiModal = {
 }
 
 
-// =================DAY 6 ENUM===============
+// =================DAY 7 ENUM===============
 enum WeekDay {
   Sunday,
   Monday,
@@ -835,7 +835,7 @@ enum E { V1, V2, V3, ..., Vn }
 
 
 
-//================= day 7 明文型別==============
+//================= day 8 明文型別==============
 /**
  * 在之前的學習中，都可以看到明文型別的出現
  * 
@@ -989,3 +989,191 @@ A 不能缺少任一個 T 所規定的屬性
 
  */
 
+
+
+// =============day 9- Optional property===========
+
+// 以下用在使用者註冊時的資訊欄位，使用者不一定全部填寫
+enum Gender { Male, Female, Other }
+type AccountInfo = {
+  account: string,
+  age: number,
+  nickname: string,
+  password: string,
+  birthday: Date,
+  gender: Gender,
+  subscribed: boolean
+}
+// 若使用者沒有全部填寫，TS 就會警示。
+// 不是很有彈性的做法。
+var user1AccountInfo: AccountInfo = {
+  account: 'user1@example.com',
+  age: 18,
+  subscribed: true,
+  password: 'axlfdkjasfd'
+}
+
+// $$要如何使物件屬性保有一定程度的彈性???
+
+// 試試看下面這樣可不可以：跟 undefined 這個值進行複合型別（也就是 union）的動作
+type AccountInfo2 = {
+  account: string,
+  nickname: string | undefined,
+  password: string,
+  birthday: Date | undefined,
+  gender: Gender | undefined,
+  subscribed: boolean | undefined
+}
+// 若少了該有的屬性還是不會通過 TS 檢測
+var user2AccountInfo: AccountInfo2 = {
+  account: 'user1@example.com',
+  // nickname: 'john',
+  // birthday: new Date(),
+  gender: Gender.Female,
+  password: 'axlfdkjasfd',
+  subscribed: true,
+}
+
+// 為什麼會這樣?
+
+// day3 曾經測試物件如下：
+let someone22 = {
+  name: undefined,
+  age: null
+}
+someone22.name = 'john'
+someone22.age = 333
+
+// 定義 文明型別
+type someOne = {
+  name: undefined,
+  age: null
+}
+// 套用 文明型別
+let someone33: someOne = {}
+/**TS 提示如下：
+let someone33: someOne
+Type '{}' is missing the following properties from type 'someOne': name, age
+ */
+
+//之所以會有上述的狀況，說明如下：
+
+/**
+ *
+重點 1. undefined 作為物件屬性的型別
+若將 undefined 作為物件某些屬性的型別，儘管 undefined 在原生 JS 的意味就是可以放置該屬性為空值，甚至是不去定義的狀態。但在 TypeScript 的世界裡：undefined 這種原始型別代表必須存取名為 undefined 這種值，並不是完全省略定義它！
+ */
+
+// 介紹今天的主角：
+// 試試看下面這樣可不可以：跟 undefined 這個值進行複合型別（也就是 union）的動作
+type AccountInfo3 = {
+  account: string,
+  nickname?: string,
+  password: string,
+  birthday?: Date,
+  gender?: Gender,
+  subscribed: boolean
+}
+
+/**
+ * TS 型別推論會是下面這樣：
+type AccountInfo3 = {
+    account: string;
+    nickname?: string | undefined;
+    password: string;
+    birthday?: Date | undefined;
+    gender?: Gender | undefined;
+    subscribed: boolean;
+}
+
+ */
+// 少了該有的屬性, 而該屬性在型別化名定義中為「選用的」，就可以通過 TS 檢測
+var user3AccountInfo: AccountInfo3 = {
+  account: 'user1@example.com',
+  nickname: undefined,  // 可以不放 nickname ，或者，給它 undefined ，都可以，
+  // 因為 TS 型別化名定義中 nickname 為 string | undefined
+  // birthday: new Date(),
+  gender: Gender.Female,
+  password: 'axlfdkjasfd',
+  subscribed: true,
+}
+
+
+/**
+重點 2. 物件屬性上的選用註記
+若某屬性 P 屬於某物件的明文型別 的屬性之一，且該屬性對應的型別值為 T，而 A 是該明文型別的別名，則：
+
+type A = {
+  P?: T
+};
+代表的意義是，被型別化名 A 作型別註記的變數，可以：
+
+選擇性地忽略 P 這個屬性。
+因為推論出來的結果會是以下的形式，因此也可以選擇寫出 P 屬性但填入 undefined 這個值：
+{ P?: T | undefined }
+ */
+
+
+// 大部分時候，在 VS code 中，將滑鼠移到型別化名或變數時，就可以看見明文型別。(之前的狀況都是此種)
+
+// 有些時候我們還是會看不到型別化名背後的結構，這時候該怎麼辦？我要怎麼快速找到該化名連結到實際上在程式碼間的定義位置呢？ => 舉例如下：
+
+type AccountSystem = {
+  account: string,
+  password: string
+}
+type AccountPersonalInfo = {
+  nickname?: string,
+  birth?: Date
+}
+// 使用複合型別的 Intersection
+type PersonalAccount = AccountSystem & AccountPersonalInfo
+
+let accountGary: PersonalAccount = {
+  account: 'gagaga',
+  password: '<hash-password>',
+  nickname: undefined,
+}
+//
+/**
+滑鼠移到 PersonalAccount，會出現：
+type PersonalAccount = AccountSystem & AccountPersonalInfo
+
+問題：我仍然是看不到 AccountSystem 或 AccountPersonalInfo 這二個型別化名背後的明文型別結構！
+ */
+
+/** Solution:
+使用 VS code 快捷鍵：滑鼠移至變數上(例如 型別化名 PersonalAccount)，按 Alt，此時變數名稱出現底線時，
+點左鍵即可跳至變數宣告之處
+ */
+
+// 測試：選用型別在函式參數中
+let optionPara = function (msg?: string, nickname: string) {
+  console.log('msg:', msg)
+  console.log('nickname:', nickname)
+}
+/** TS 跳警示：
+(parameter) nickname: string
+必要參數不得接在選擇性參數之後。
+ */
+
+// 對調位置一下： 把選擇性參數放在後方
+let optionPara2 = function (nickname: string, msg?: string) {
+  console.log('msg:', msg)
+  console.log('nickname:', nickname)
+}
+
+// 測試：選用型別在 tuple 中
+type tupleTest = [string, number, Date?, Boolean]
+/** TS error:
+interface Boolean
+A required element cannot follow an optional element.
+ */
+// 修正：選用型別放在 tuple 最後面
+type tupleTest22 = [string, number, Boolean, Date?]
+
+// 少了 Date 這個值，不會跳 error
+let tupleTest22: tupleTest22 = ['John', 18, true]
+
+// 少了 Boolean 這個值，就會跳 error
+let tupleTest33: tupleTest22 = ['John', 18]
